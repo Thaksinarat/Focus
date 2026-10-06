@@ -1,3 +1,7 @@
 <template>
-    <div class="bg-accent q-py-md q-px-lg"></div>
+    <div>Hello</div>
 </template>
+
+<script setup>
+    
+</script>
