@@ -30,7 +30,7 @@
     </div>
 
     <!-- ภาพ -->
-    <q-img src="/imgs/main_pic.png" alt="main" class="col-12 col-md-6" fit="contain"></q-img>
+    <q-img src="/imgs/main_pic.png" alt="main" class="q-mt-lg col-12 col-md-6" fit="contain"></q-img>
   </q-page>
 </template>
 
