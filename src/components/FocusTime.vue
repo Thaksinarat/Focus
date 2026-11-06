@@ -1,5 +1,5 @@
 <template>
-  <q-page padding>
+  <div>
     <!-- menu เลือกเวลา -->
     <div class="q-pa-md q-gutter-sm">
       <q-btn
@@ -31,7 +31,7 @@
 
     <!-- ภาพ -->
     <q-img src="/imgs/main_pic.png" alt="main" class="q-mt-lg col-12 col-md-6" fit="contain"></q-img>
-  </q-page>
+  </div>
 </template>
 
 <script setup>
