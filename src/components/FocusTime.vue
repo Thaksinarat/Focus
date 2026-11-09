@@ -1,9 +1,43 @@
 <template>
   <q-page padding>
     <!-- Header -->
-    <div class="text-center q-mb-xl">
+    <div class="text-center">
       <p class="text-h3">Focus</p>
-      <p class="text-subtitle1">Pick the right time and focus your task!</p>
+      <p class="text-subtitle1">Pick the right time and focus your task! ✨</p>
+    </div>
+
+    <!-- ปุ่มเลือกเวลา -->
+    <div class="text-center q-mb-md">
+      <!-- 25 Mins -->
+      <q-btn
+        class="q-mx-xs"
+        unelevated
+        rounded
+        color="secondary"
+        text-color="text-font-light"
+        @click="setTime(1500)"
+        >25 Mins</q-btn
+      >
+      <!-- 30 Mins -->
+      <q-btn
+        class="q-mx-xs"
+        unelevated
+        rounded
+        color="secondary"
+        text-color="text-font-light"
+        @click="setTime(1800)"
+        >30 Mins</q-btn
+      >
+      <!-- custom -->
+      <q-btn
+        class="q-mx-xs"
+        unelevated
+        rounded
+        color="secondary"
+        text-color="text-font-light"
+        @click="setTime(1800)"
+        >Customs</q-btn
+      >
     </div>
     <!-- แสดงเวลานับถอยหลัง -->
     <div class="text-center">
@@ -116,9 +150,8 @@ const resetTimer = () => {
   timeLeft.value = defaultFocus
 }
 
+// เมื่อปิดให้หยุดนับถอยหลัง
 onUnmounted(() => {
   stopTimer()
 })
-
-console.log(timeStore.deepFocus)
 </script>
