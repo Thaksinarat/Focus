@@ -75,6 +75,12 @@
         />
       </div>
     </div>
+
+    <!-- ภาพตอนจับเวลา -->
+    <!-- <div v-if="isRunning == true" class="q-mt-md text-center">
+      <img src="imgs/animation.gif" alt="animation_running" width="240px">
+    </div> -->
+    
   </q-page>
 </template>
 
