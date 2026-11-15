@@ -11,19 +11,19 @@ export default defineConfig((/* ctx */) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['pinia'],
+    boot: ['pinia', 'axios', 'auth'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: ['app.scss'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
-      // 'ionicons-v4',
-      // 'mdi-v7',
-      // 'fontawesome-v7',
-      // 'eva-icons',
-      // 'themify',
-      // 'line-awesome',
+      'ionicons-v4',
+      'mdi-v7',
+      'fontawesome-v7',
+      'eva-icons',
+      'themify',
+      'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font', // optional, you are not bound to it
@@ -76,9 +76,16 @@ export default defineConfig((/* ctx */) => {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
-      config: {},
+      config: {
+        loading: {
+          spinner: 'QSpinnerAudio',
+          spinnerColor: 'accent',
+          message: 'Loading...',
+          messageColor: 'accent'
+        }
+      },
 
-      // iconSet: 'material-icons', // Quasar icon set
+      iconSet: 'fontawesome-v7', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 
       // For special cases outside of where the auto-import strategy can have an impact
@@ -89,7 +96,7 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: ['Notify', 'Loading', 'Dialog'],
     },
 
     // animations: 'all', // --- includes all animations

@@ -1,8 +1,8 @@
 <template>
-  <q-page padding>
+  <div class="q-mt-lg q-mb-lg">
     <!-- Header -->
     <div class="text-center">
-      <p class="text-h3">Focus</p>
+      <p class="text-h3 text-weight-bold">Focus</p>
       <p class="text-subtitle1">Pick the right time and focus your task! ✨</p>
     </div>
 
@@ -35,7 +35,7 @@
         rounded
         color="secondary"
         text-color="text-font-light"
-        @click="setTime(1800)"
+        @click="openDialog()"
         >Customs</q-btn
       >
     </div>
@@ -76,28 +76,80 @@
       </div>
     </div>
 
-    <!-- ภาพตอนจับเวลา -->
-    <!-- <div v-if="isRunning == true" class="q-mt-md text-center">
-      <img src="imgs/animation.gif" alt="animation_running" width="240px">
-    </div> -->
-    
-  </q-page>
+    <!-- dialog -->
+    <q-dialog v-model="isOpen" persistent>
+      <q-card style="min-width: 340px; max-width: 90vw">
+        <!-- ส่วนหัว -->
+        <q-card-section class="bg-accent">
+          <div>
+            <p class="text-h5">Customs time</p>
+            <p class="text-subtitle2">How long do you want to focus?</p>
+          </div>
+        </q-card-section>
+        <!-- ส่วนฟอร์ม -->
+        <q-form @submit.prevent="onSubmit(customTime)">
+          <!-- ช่อง input -->
+          <q-card-section class="q-gutter-md">
+            <!-- นาที -->
+            <div class="col-6">
+              <q-input
+                v-model.number="customMinutes"
+                type="number"
+                label="minutes"
+                outlined
+                autofocus
+                rounded
+                color="black"
+              ></q-input>
+            </div>
+            <!-- วินาที -->
+            <div class="col-6">
+              <q-input
+                v-model.number="customSeconds"
+                type="number"
+                label="seconds"
+                outlined
+                rounded
+                color="black"
+              ></q-input>
+            </div>
+          </q-card-section>
+          <!-- ปุ่ม -->
+          <q-card-section class="column items-end">
+            <div>
+              <q-btn
+                flat
+                rounded
+                label="close"
+                unelevated
+                @click="closeDialog()"
+              ></q-btn>
+              <q-btn
+                rounded
+                label="set!"
+                color="black"
+                text-color="white"
+                unelevated
+                type="submit"
+              ></q-btn>
+            </div>
+          </q-card-section>
+        </q-form>
+      </q-card>
+    </q-dialog>
+  </div>
 </template>
 
 <script setup>
 import { ref, computed, onUnmounted } from 'vue'
-import { useTimeStore } from '@/stores/timeStore'
 import { useQuasar } from 'quasar'
-
-// create time store
-const timeStore = useTimeStore()
 
 // create Q
 const $q = useQuasar()
 
 // timer
-const defaultFocus = timeStore.defaultFocus
-const timeLeft = ref(defaultFocus)
+const defaultFocus = ref(1500)
+const timeLeft = ref(defaultFocus.value)
 const isRunning = ref(false)
 let timerInterval = null
 
@@ -131,10 +183,17 @@ const startTimer = () => {
       timeLeft.value--
     } else {
       stopTimer()
-      $q.notify({
-        type: 'negative',
-        message: 'Time out!',
-        icon: 'clock',
+      $q.dialog({
+        title: '🎉',
+        message: `Let's take some rest and than focus on your work`,
+        color: 'black',
+        ok: {
+          rounded: true,
+          unelevated: true,
+          size: 'md',
+        },
+        position: 'top',
+        class: 'q-pa-md text-center',
       })
     }
   }, 1000)
@@ -150,10 +209,63 @@ const stopTimer = () => {
   }
 }
 
+// set time
+const setTime = (time) => {
+  stopTimer()
+  // ตั้งค่าตัวจับเวลาให้เท่ากับค่า time
+  defaultFocus.value = time
+  // แสดงผลค่าที่เปลี่ยนไป
+  timeLeft.value = time
+}
+
+// dialog custom time
+// เปิด/ปิด dialog
+const isOpen = ref(false)
+// เวลาที่ตั้งค่า
+const customMinutes = ref(0)
+const customSeconds = ref(0)
+
+// function เปิด Dialog
+const openDialog = () => {
+  customMinutes.value = 0
+  customSeconds.value = 0
+  isOpen.value = true
+}
+// function ปิด dialog
+const closeDialog = () => {
+  isOpen.value = false
+}
+// function onSubmit
+const onSubmit = () => {
+  const totalTime = customMinutes.value * 60 + customSeconds.value
+
+  // ถ้าค่า น้อยกว่า 0
+  if (totalTime <= 0) {
+    $q.notify({
+      type: 'warning',
+      message: 'Time must be more than 0 seconds',
+      position: 'bottom-right',
+    })
+    // ไม่ปิด dialog
+    return
+  }
+
+  // ถ้าไม่ ให้ setTime
+  setTime(totalTime)
+  $q.notify({
+    type: 'positive',
+    message: 'Custom time completed!',
+    position: 'bottom-right'
+  })
+
+  // ปิด dialog
+  closeDialog()
+}
+
 // reset
 const resetTimer = () => {
   stopTimer()
-  timeLeft.value = defaultFocus
+  timeLeft.value = defaultFocus.value
 }
 
 // เมื่อปิดให้หยุดนับถอยหลัง
