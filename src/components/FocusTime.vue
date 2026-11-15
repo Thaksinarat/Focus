@@ -43,7 +43,6 @@
     <div class="text-center">
       <div>
         <p class="text-h1">{{ formatTime }}</p>
-        <p class="q-ml-md text-h5">mins</p>
       </div>
     </div>
 
