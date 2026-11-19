@@ -116,13 +116,7 @@
           <!-- ปุ่ม -->
           <q-card-section class="column items-end">
             <div>
-              <q-btn
-                flat
-                rounded
-                label="close"
-                unelevated
-                @click="closeDialog()"
-              ></q-btn>
+              <q-btn flat rounded label="close" unelevated @click="closeDialog()"></q-btn>
               <q-btn
                 rounded
                 label="set!"
@@ -243,7 +237,7 @@ const onSubmit = () => {
     $q.notify({
       type: 'warning',
       message: 'Time must be more than 0 seconds',
-      position: 'bottom-right',
+      position: 'top-right',
     })
     // ไม่ปิด dialog
     return
@@ -254,7 +248,7 @@ const onSubmit = () => {
   $q.notify({
     type: 'positive',
     message: 'Custom time completed!',
-    position: 'bottom-right'
+    position: 'top-right',
   })
 
   // ปิด dialog

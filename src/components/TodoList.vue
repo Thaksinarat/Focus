@@ -1,5 +1,5 @@
 <template>
-  <div class="q-mt-md q-pa-md">
+  <div class="q-mt-md q-pa-md q-pb-lg">
     <!-- ส่วนหัว + ปุ่มเพิ่ม task -->
     <div class="row items-center justify-between q-mb-md q-px-lg">
       <div class="text-h5 text-weight-bold">
@@ -254,7 +254,7 @@ const onSubmit = async () => {
       $q.notify({
         type: 'positive',
         message: 'Updated your task!',
-        position: 'bottom-right',
+        position: 'top-right',
       })
     } else {
       // เพิ่ม
@@ -262,7 +262,7 @@ const onSubmit = async () => {
       $q.notify({
         type: 'positive',
         message: 'added a new task!',
-        position: 'bottom-right',
+        position: 'top-right',
       })
     }
     // ปิด dialog
@@ -272,7 +272,7 @@ const onSubmit = async () => {
     $q.notify({
       type: 'negative',
       message: 'Oop! Try to save again!',
-      position: 'bottom-right',
+      position: 'top-right',
     })
   } finally {
     isSaving.value = false
@@ -290,7 +290,7 @@ const onDelete = (task) => {
       unelevated: true,
       size: 'md',
       textColor: 'black',
-      color: 'white'
+      color: 'white',
     },
     ok: {
       label: 'Delete!',
@@ -307,14 +307,14 @@ const onDelete = (task) => {
       $q.notify({
         type: 'positive',
         message: 'deleted!',
-        position: 'bottom-right',
+        position: 'top-right',
       })
     } catch (error) {
       console.log('onDelete (task) Error: ', error)
       $q.notify({
         type: 'negative',
         message: 'Oop! Try to delete again!',
-        position: 'bottom-right',
+        position: 'top-right',
       })
     }
   })
@@ -329,7 +329,7 @@ const onToggle = async (taskId) => {
     $q.notify({
       type: 'negative',
       message: 'Oop! Try to update status again!',
-      position: 'bottom-right',
+      position: 'top-right',
     })
   }
 }
