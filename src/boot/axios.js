@@ -13,7 +13,7 @@ api.interceptors.request.use((config) => {
 
   // ตรวจ session ก่อนส่ง request
   if (authStore.accessToken && !authStore.validateSession()) {
-    return Promise.reject(new Error('Session หมดอายุ กรุณา Login ใหม่'))
+    return Promise.reject(new Error('Session expires, please sign in again.'))
   }
 
   // ส่ง Access Token ไปกับ Request

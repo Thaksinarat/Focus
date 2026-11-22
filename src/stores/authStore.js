@@ -71,13 +71,13 @@ export const useAuthStore = defineStore(
           (item) => item.username === username && item.password === password,
         )
         if (!foundUser) {
-          throw new Error('Username หรือ Password ไม่ถูกต้อง')
+          throw new Error('Username or Password incorrect.')
         }
         startSession(foundUser)
         return user.value
       } catch (error) {
         errorMessage.value =
-          error.response?.data?.message || error.message || 'ไม่สามารถเข้าสู่ระบบได้'
+          error.response?.data?.message || error.message || `Can't sign in, Try again.`
         throw error
       } finally {
         loading.value = false
@@ -91,7 +91,7 @@ export const useAuthStore = defineStore(
       try {
         const response = await getUsers()
         if (response.data.some((item) => item.username === username)) {
-          throw new Error('Username นี้ถูกใช้แล้ว')
+          throw new Error('Username has used, Try another username.')
         }
         const { data } = await createUser({
           name,
@@ -104,7 +104,7 @@ export const useAuthStore = defineStore(
         return user.value
       } catch (error) {
         errorMessage.value =
-          error.response?.data?.message || error.message || 'ไม่สามารถสมัครสมาชิกได้'
+          error.response?.data?.message || error.message || `Can't subscript premium package, Try again.`
         throw error
       } finally {
         loading.value = false
@@ -114,10 +114,10 @@ export const useAuthStore = defineStore(
     // สมัคร premium
     const upgradeToPremium = async () => {
       if (!user.value) {
-        throw new Error('กรุณา Login ก่อน')
+        throw new Error('Please Sign in first.')
       }
       if (role.value === 'premium') {
-        throw new Error('คุณเป็นสมาชิก Premium อยู่แล้ว')
+        throw new Error('You have already been premium member.')
       }
 
       loading.value = true
@@ -139,7 +139,7 @@ export const useAuthStore = defineStore(
 
     // แก้ข้อมูล user (name, password, role ฯลฯ) แล้วซิงก์กลับเข้า store
     const updateProfile = async (changes) => {
-      if (!user.value) throw new Error('กรุณา Login ก่อน')
+      if (!user.value) throw new Error('Please Sign in first.')
       const { data: current } = await getUserById(user.value.id) // ดึงข้อมูลล่าสุดมาก่อน
       const { data } = await updateUser(user.value.id, { ...current, ...changes })
       user.value = normalizeUser(data)
