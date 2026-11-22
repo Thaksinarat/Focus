@@ -6,6 +6,7 @@ import {
   createWebHistory,
 } from 'vue-router'
 
+import { useAuthStore } from '@/stores/authStore.js'
 import routes from './routes.js'
 
 /*
@@ -34,5 +35,25 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   })
 
+  Router.beforeEach((to) => {
+    const authStore = useAuthStore()
+
+    // ตรวจ session
+    if(to.meta.requiresAuth && !authStore.validateSession()) {
+      return '/sign-in'
+    }
+
+    // ตรวจสถานะ Login
+    if(to.meta.requiresAuth && !authStore.isAuthenticated) {
+      return '/sign-in'
+    }
+
+  // ตรวจสอบ role ที่อนุญาต
+  const allowedRole = to.meta.roles
+  if (allowedRole && !allowedRole.includes(authStore.role)) {
+    return '/'
+  }
+  return true
+  })
   return Router
 })

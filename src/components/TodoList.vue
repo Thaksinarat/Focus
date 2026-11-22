@@ -1,5 +1,5 @@
 <template>
-  <div class="q-mt-md q-pa-md q-pb-lg">
+  <div class="q-mt-md q-pa-md">
     <!-- ส่วนหัว + ปุ่มเพิ่ม task -->
     <div class="row items-center justify-between q-mb-md q-px-lg">
       <div class="text-h5 text-weight-bold">
@@ -167,9 +167,11 @@ import { onMounted, reactive, ref, computed } from 'vue'
 import { useQuasar } from 'quasar'
 import { useTaskStore } from '@/stores/taskStore'
 import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/authStore'
 
 const $q = useQuasar()
 const taskStore = useTaskStore()
+const authStore = useAuthStore()
 const { tasks, loading } = storeToRefs(taskStore)
 
 // option-group
@@ -199,10 +201,18 @@ const filterTasks = computed(() => {
   return tasks.value
 })
 
-// ดึงข้อมูลของ user (!!!!! จำลองเฉย ๆ ยังไม่ได้ทำ authStore ที)
-onMounted(() => {
-  // taskStore.fetchTasks(authStore.user.id)
-  taskStore.fetchTasks('1')
+// ดึงข้อมูลของ user ตาม
+onMounted(async () => {
+  try {
+    await taskStore.fetchTasks(authStore.user.id)
+  } catch (error) {
+    console.log('fetchTasks Error: ', error)
+    $q.notify({
+      type: 'negative',
+      message: 'โหลดงานไม่สำเร็จ',
+      position: 'top',
+    })
+  }
 })
 
 // Dialog เพิ่ม/แก้ไข task
@@ -254,7 +264,7 @@ const onSubmit = async () => {
       $q.notify({
         type: 'positive',
         message: 'Updated your task!',
-        position: 'top-right',
+        position: 'top',
       })
     } else {
       // เพิ่ม
@@ -262,7 +272,7 @@ const onSubmit = async () => {
       $q.notify({
         type: 'positive',
         message: 'added a new task!',
-        position: 'top-right',
+        position: 'top',
       })
     }
     // ปิด dialog
@@ -272,7 +282,7 @@ const onSubmit = async () => {
     $q.notify({
       type: 'negative',
       message: 'Oop! Try to save again!',
-      position: 'top-right',
+      position: 'top',
     })
   } finally {
     isSaving.value = false
@@ -307,14 +317,14 @@ const onDelete = (task) => {
       $q.notify({
         type: 'positive',
         message: 'deleted!',
-        position: 'top-right',
+        position: 'top',
       })
     } catch (error) {
       console.log('onDelete (task) Error: ', error)
       $q.notify({
         type: 'negative',
         message: 'Oop! Try to delete again!',
-        position: 'top-right',
+        position: 'top',
       })
     }
   })
@@ -329,7 +339,7 @@ const onToggle = async (taskId) => {
     $q.notify({
       type: 'negative',
       message: 'Oop! Try to update status again!',
-      position: 'top-right',
+      position: 'top',
     })
   }
 }

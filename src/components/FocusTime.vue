@@ -43,6 +43,7 @@
     <div class="text-center">
       <div>
         <p class="text-h1">{{ formatTime }}</p>
+        <p class="q-ml-md text-h5">mins</p>
       </div>
     </div>
 
@@ -136,6 +137,7 @@
 <script setup>
 import { ref, computed, onUnmounted } from 'vue'
 import { useQuasar } from 'quasar'
+import alarmSound from '@/assets/sounds/alarm.mp3'
 
 // create Q
 const $q = useQuasar()
@@ -157,6 +159,17 @@ const formatTime = computed(() => {
   return `${paddedMinutes}:${paddedSeconds}`
 })
 
+// เสียงเตือนหมดเวลา
+const alarmAudio = new Audio(alarmSound)
+alarmAudio.volume = 1
+alarmAudio.loop = true
+
+// หยุดเสียงเตือน
+const stopAlarm = () => {
+  alarmAudio.pause()
+  alarmAudio.currentTime = 0
+}
+
 // สลับการทำงาน
 const toggleTimer = () => {
   if (isRunning.value) {
@@ -169,6 +182,7 @@ const toggleTimer = () => {
 // start
 const startTimer = () => {
   if (timeLeft.value <= 0) return
+  stopAlarm()
   // กำลังเล่น = จริง
   isRunning.value = true
   timerInterval = setInterval(() => {
@@ -176,10 +190,19 @@ const startTimer = () => {
       timeLeft.value--
     } else {
       stopTimer()
+
+      // หยุดเพลง
+      window.dispatchEvent(new CustomEvent('time-out'))
+
+      // สั่งให้เล่นเสียงเตือนตอนหมดเวลา
+      alarmAudio.currentTime = 0
+      alarmAudio.play()
+
       $q.dialog({
         title: '🎉',
         message: `Let's take some rest and than focus on your work`,
         color: 'black',
+        persistent: true,
         ok: {
           rounded: true,
           unelevated: true,
@@ -187,7 +210,7 @@ const startTimer = () => {
         },
         position: 'top',
         class: 'q-pa-md text-center',
-      })
+      }).onDismiss(stopAlarm)
     }
   }, 1000)
 }
@@ -205,6 +228,7 @@ const stopTimer = () => {
 // set time
 const setTime = (time) => {
   stopTimer()
+  stopAlarm()
   // ตั้งค่าตัวจับเวลาให้เท่ากับค่า time
   defaultFocus.value = time
   // แสดงผลค่าที่เปลี่ยนไป
@@ -237,7 +261,7 @@ const onSubmit = () => {
     $q.notify({
       type: 'warning',
       message: 'Time must be more than 0 seconds',
-      position: 'top-right',
+      position: 'top',
     })
     // ไม่ปิด dialog
     return
@@ -248,7 +272,7 @@ const onSubmit = () => {
   $q.notify({
     type: 'positive',
     message: 'Custom time completed!',
-    position: 'top-right',
+    position: 'top'
   })
 
   // ปิด dialog
@@ -258,11 +282,13 @@ const onSubmit = () => {
 // reset
 const resetTimer = () => {
   stopTimer()
+  stopAlarm()
   timeLeft.value = defaultFocus.value
 }
 
-// เมื่อปิดให้หยุดนับถอยหลัง
+// เมื่อปิดให้หยุดนับถอยหลังและปิดเสียงเตือน
 onUnmounted(() => {
   stopTimer()
+  stopAlarm()
 })
 </script>

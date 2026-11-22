@@ -10,7 +10,7 @@
           :class="{ marquee: isOverflow }"
           :style="{ animationDuration: marqueeDuration }"
         >
-          {{ currentSong?.name || 'ยังไม่ได้เลือกเพลง' }}
+          {{ currentSong?.name || `haven't select the song yet.` }}
         </span>
       </div>
 
@@ -65,7 +65,7 @@
       </q-toolbar>
 
       <div class="q-pa-md q-gutter-y-sm">
-        <q-input v-model="search" dense outlined clearable placeholder="search...">
+        <q-input v-model="search" dense outlined clearable placeholder="Search...">
           <template #prepend><q-icon name="fa-solid fa-search" /></template>
         </q-input>
         <div class="row items-center justify-between">
@@ -76,7 +76,7 @@
             toggle-color="grey-10"
             :options="[
               { label: 'All', value: 'all' },
-              { label: 'Favorites', value: 'favorite'},
+              { label: 'Favorite', value: 'favorite' },
             ]"
           />
           <q-btn
@@ -85,7 +85,7 @@
             no-caps
             class="pill-btn"
             icon="fa-solid fa-plus"
-            label="New Song"
+            label="New song"
             @click="openAdd"
           />
         </div>
@@ -97,12 +97,12 @@
 
         <div v-else-if="!songs.length" class="column items-center q-pa-xl text-grey-7">
           <q-icon name="fa-solid fa-music_off" size="48px" />
-          <div class="q-mt-sm text-body1">Don't have song yet. Please add new song.</div>
+          <div class="q-mt-sm text-body1">Don't have any song, please new song.</div>
         </div>
 
         <div v-else-if="!filteredSongs.length" class="column items-center q-pa-xl text-grey-7">
           <q-icon name="fa-solid fa-search_off" size="48px" />
-          <div class="q-mt-sm">Sorry, Not found that song.</div>
+          <div class="q-mt-sm">Sorry, Don't found any song.</div>
         </div>
 
         <q-list v-else separator>
@@ -112,7 +112,7 @@
             clickable
             v-ripple
             :active="song.id === currentId"
-            active-class="bg-grey-3"
+            active-class="bg-grey-3 text-black"
             @click="onSelect(song)"
           >
             <q-item-section avatar>
@@ -126,8 +126,7 @@
             </q-item-section>
 
             <q-item-section>
-              <q-item-label lines="1">{{ song.name }}</q-item-label>
-              <q-item-label caption lines="1">{{ song.url }}</q-item-label>
+              <q-item-label lines="5">{{ song.name }}</q-item-label>
             </q-item-section>
 
             <q-item-section side>
@@ -180,7 +179,7 @@
             color="grey-10"
             label-color="grey-8"
             label="Song's name"
-            :rules="[(v) => !!v?.trim() || 'Type some name']"
+            :rules="[(v) => !!v?.trim() || 'Please enter some text.']"
           />
           <q-input
             v-model="form.url"
@@ -191,8 +190,8 @@
             label="ลิงก์ YouTube"
             placeholder="https://www.youtube.com/watch?v=..."
             :rules="[
-              (v) => !!v?.trim() || 'Input some Link.',
-              (v) => !!extractVideo(v) || `This Link doesn't exist.`,
+              (v) => !!v?.trim() || 'please enter youtube link.',
+              (v) => !!extractVideo(v) || 'Link incorrect, Try again.',
             ]"
           />
         </q-card-section>
@@ -222,13 +221,11 @@
   </q-dialog>
   <q-dialog v-model="deleteOpen" persistent>
     <q-card style="width: 380px; max-width: 90vw">
-      <q-card-section class="text-h6">Delete This song?</q-card-section>
-      <q-card-section>
-        Do you want to delete "{{ deleteTarget?.name }}" ?
-      </q-card-section>
+      <q-card-section class="text-h6">Delete</q-card-section>
+      <q-card-section> Do you want to delete "{{ deleteTarget?.name }}"? </q-card-section>
       <q-card-actions align="right">
-        <q-btn flat rounded no-caps label="cancel" v-close-popup :disable="deleting" />
-        <q-btn rounded unelevated color="negative" no-caps label="Delete!" :loading="deleting" @click="onDelete" />
+        <q-btn flat no-caps label="cancel" v-close-popup :disable="deleting" />
+        <q-btn color="negative" no-caps label="delete" :loading="deleting" @click="onDelete" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -240,13 +237,29 @@ import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
 import { useSongStore, extractVideo } from '@/stores/songStore'
 
+// Premium
+import { useAuthStore } from '@/stores/authStore'
+
 const $q = useQuasar()
 const store = useSongStore()
 const { songs, loading, currentId, currentSong, isPlaying } = storeToRefs(store)
+const authStore = useAuthStore()
 
 const playerHost = ref(null)
 let player = null
 const playerReady = ref(false)
+
+watch(
+  () => authStore.role,
+  (newRole) => {
+    if (newRole !== 'premium') {
+      if (playerReady.value) {
+        player.stopVideo()
+      }
+      store.setPlaying(false)
+    }
+  },
+)
 
 //โหลดสคริป yt
 
@@ -266,8 +279,8 @@ function loadYouTubeApi() {
 //สร้่างตัวเล่น
 onMounted(async () => {
   store
-    .fetchSongs()
-    .catch(() => $q.notify({ type: 'negative', message: 'Loading failed!' }))
+    .fetchSongs(authStore.user.id)
+    .catch(() => $q.notify({ type: 'negative', message: 'Loaded failed!, Try again.' }))
 
   await loadYouTubeApi()
   const el = document.createElement('div')
@@ -290,7 +303,7 @@ onMounted(async () => {
       },
       onError: () => {
         store.setPlaying(false)
-        $q.notify({ type: 'warning', message: `Can't play this song, playing the next song.` })
+        $q.notify({ type: 'warning', message: `Can't play this song, skiped next song.` })
         skip(1)
       },
     },
@@ -301,12 +314,24 @@ onBeforeUnmount(() => player?.destroy())
 
 //โหลดวิดิโอและเล่นมัน
 function playCurrent() {
+  if (authStore.role !== 'premium') {
+    if (playerReady.value) player.stopVideo()
+    store.setPlaying(false)
+    return
+  }
   const id = extractVideo(currentSong.value?.url)
   if (playerReady.value && id) player.loadVideoById(id)
 }
 watch(currentId, playCurrent)
 
 function togglePlay() {
+  if (authStore.role !== 'premium') {
+    $q.notify({
+      type: 'warning',
+      message: 'For "Premium" member only. Join us premium.',
+    })
+    return
+  }
   if (!currentSong.value) {
     store.step(1)
     return
@@ -334,7 +359,7 @@ async function onToggleFavorite(song) {
   try {
     await store.toggleFavorite(song)
   } catch {
-    $q.notify({ type: 'negative', message: 'Add favorite failed! Try again.' })
+    $q.notify({ type: 'negative', message: 'Save favorite song failed.' })
   }
 }
 
@@ -396,14 +421,14 @@ async function onSave() {
       await store.updateSong(editingId.value, form.value)
       // แก้ลิงก์ของเพลง
       if (urlChanged && editingId.value === currentId.value) playCurrent()
-      $q.notify({ type: 'positive', message: 'Updated song!' })
+      $q.notify({ type: 'positive', message: 'updated song!' })
     } else {
       await store.addSong(form.value)
-      $q.notify({ type: 'positive', message: 'Added a new song!' })
+      $q.notify({ type: 'positive', message: 'Added new song!' })
     }
     addOpen.value = false
   } catch {
-    $q.notify({ type: 'negative', message: `Saving failed! Try again.` })
+    $q.notify({ type: 'negative', message: 'save failed, Try again.' })
   } finally {
     saving.value = false
   }
@@ -424,13 +449,29 @@ async function onDelete() {
     const wasCurrent = await store.removeSong(deleteTarget.value.id)
     if (wasCurrent && playerReady.value) player.stopVideo() // ลบเพลงที่เล่นอยู่ -> หยุดเสียง
     deleteOpen.value = false
-    $q.notify({ type: 'positive', message: 'Deleted song!' })
+    $q.notify({ type: 'positive', message: 'deleted song' })
   } catch {
-    $q.notify({ type: 'negative', message: 'Delete failed! Try again.' })
+    $q.notify({ type: 'negative', message: 'delete failed, Try again.' })
   } finally {
     deleting.value = false
   }
 }
+
+// สั่งหยุดเพลงตอนหมดเวลา
+function stopMusic() {
+  if (!playerReady.value) return
+
+  player.pauseVideo()
+  store.setPlaying(false)
+}
+
+// หยุดเพลงเมื่อเวลาหมด
+onMounted(() => {
+  window.addEventListener('time-out', stopMusic)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('time-out', stopMusic)
+})
 </script>
 
 <style scoped>

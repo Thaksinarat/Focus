@@ -1,8 +1,13 @@
+import { boot } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
-export default ({ app }) => {
-  const pinia = createPinia()
-  pinia.use(piniaPluginPersistedstate)
+const pinia = createPinia()
+
+pinia.use(piniaPluginPersistedstate)
+
+export default boot (({ app }) => {
   app.use(pinia)
-}
+})
+
+export { pinia }
