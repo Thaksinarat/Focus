@@ -187,7 +187,7 @@
             rounded
             color="grey-10"
             label-color="grey-8"
-            label="ลิงก์ YouTube"
+            label="YouTube Link"
             placeholder="https://www.youtube.com/watch?v=..."
             :rules="[
               (v) => !!v?.trim() || 'please enter youtube link.',
