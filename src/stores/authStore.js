@@ -11,8 +11,8 @@ import {
 import { createFakeToken } from '@/utils/fakeToken'
 import { useUserDataStore } from './userDataStore'
 
-// เวลาเซสซัน
-const SESSION = 30 * 60 * 1000
+// เวลาเซสซัน (12 ขม.)
+const SESSION = 12 * 60 * 60 * 1000
 
 // แปลง user จาก mock api ให้เป็นรูปแบบเดียว
 const normalizeUser = (raw) => ({
