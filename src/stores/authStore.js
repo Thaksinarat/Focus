@@ -14,7 +14,6 @@ import { useUserDataStore } from './userDataStore'
 // เวลาเซสซัน
 const SESSION = 30 * 60 * 1000
 
-// *****ลบได้ถ้ามีการ sign-up สร้างข้อมูลใหม่เอง******
 // แปลง user จาก mock api ให้เป็นรูปแบบเดียว
 const normalizeUser = (raw) => ({
   id: String(raw.userId ?? raw.id),
