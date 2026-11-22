@@ -18,7 +18,7 @@
         </q-item>
       </q-list>
 
-      <q-btn class="q-mt-lg" label="กลับหน้าแรก" color="accent" text-color="dark" unelevated rounded to="/" />
+      <q-btn class="q-mt-lg" label="Back to home" color="accent" text-color="dark" unelevated rounded to="/" />
     </q-card>
   </q-page>
 </template>
